@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>scratch 矢量图修复器</title>
+    <script src="FileSaver.min.js"></script>
+    <script src="jszip.min.js"></script>
+    <script src="sc_svg_snap.js"></script>
+    <script>
+
+        function GetCfg() {
+            const cfg = {};
+            if (document.getElementById("IsSnapEnable").checked) {
+                cfg.snap = { threshold: Number(document.getElementById("SnapThreshold").value) };
+            }
+            if (document.getElementById("IsSimpEnable").checked) {
+                cfg.simp = { digit: Number(document.getElementById("SimpDigit").value) };
+            }
+            if (document.getElementById("IsLinecapEnable").checked) {
+                cfg.linecap = { cap: Number(document.getElementById("LinecapType").value) };
+            }
+            if (document.getElementById("IsLinejoinEnable").checked) {
+                cfg.linejoin = { join: Number(document.getElementById("LinejoinType").value) };
+            }
+            return cfg;
+        }
+
+        function OnClickSnapSvg() {
+            document.getElementById("Error").style.display = "none";
+            const cfg = GetCfg();
+            const file = document.getElementById("SVGFile").files[0];
+            if (!file) { return; }
+            document.getElementById("Loading").style.display = "block";
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const svg = e.target.result;
+                    // 处理单张 svg 文件，这里调用了 convertSvg
+                    const newSvg = scsvgsnap.convertSvg(svg, cfg);
+                    const blob = new Blob([newSvg], { type: 'image/svg+xml' });
+                    saveAs(blob, file.name);
+                } catch(err) {
+                    document.getElementById("Error").style.display = "none";
+                } finally {
+                    document.getElementById("Loading").style.display = "none";
+                }
+            };
+            reader.readAsText(file);
+        }
+
+
+
+        /*function HandleSvgInSb3(sb3, pj) {
+            scsvgsnap.forEachCostume(pj, function(cos) {
+                if (cos.dataFormat != "svg") { return; }
+                sb3.file(cos.md5ext).async("text").then(function(svg) {
+                    // 处理 sb3 中的 svg 文件，这里调用了 convertSvg
+                    const newSvg = scsvgsnap.convertSvg(svg);
+                    sb3.file(cos.md5ext, newSvg);
+                });
+            });
+        }*/
+        // 下面是由 ai 修改过的函数
+        function HandleSnapSb3(sb3, pj, file, cfg) {
+            scsvgsnap.forEachCostume(pj, function(cos, sprite, resolve, reject) {
+                if (cos.dataFormat != "svg") {
+                    resolve(); // 如果不是 svg，‌直接解决 Promise
+                    return;
+                }
+                sb3.file(cos.md5ext).async("text").then(function(svg) {
+                    // 处理 sb3 中的 svg 文件
+                    const newSvg = scsvgsnap.convertSvg(svg, cfg);
+                    sb3.file(cos.md5ext, newSvg);
+                    resolve(); // 异步操作完成后解决 Promise
+                }).catch(reject); // 捕获错误并拒绝 Promise
+            }).then(() => {
+                // 处理完成
+                sb3.generateAsync({ type: 'blob' }).then(function(blob) {
+                    saveAs(blob, file.name);
+                });
+            }).catch((error) => {
+                console.error('处理 SVG 文件时发生错误:', error);
+                document.getElementById("Error").style.display = "block";
+            }).finally(() => {
+                document.getElementById("Loading").style.display = "none";
+            })
+        }
+
+        function OnClickSnapSb3() {
+            document.getElementById("Error").style.display = "none";
+            const cfg = GetCfg();
+            const file = document.getElementById("SB3File").files[0];
+            if (!file) { return; }
+            document.getElementById("Loading").style.display = "block";
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const arrayBuffer = evt.target.result;
+                JSZip.loadAsync(arrayBuffer).then(function(sb3) {
+                    sb3.file("project.json").async("text").then(function(pj) {
+                        HandleSnapSb3(sb3, pj, file, cfg);
+                    });
+                });
+            }
+            reader.readAsArrayBuffer(file);
+        }
+
+    </script>
+    <style>
+        .FileSelector {
+            border: 2px dashed;
+            padding: 3px;
+            cursor: pointer;
+        }
+        .Button {
+            cursor: pointer;
+        }
+        p {
+            line-height: 28px;
+        }
+    </style>
+</head>
+<body>
+    <h1>scratch 矢量图修复器</h1>
+    <p>这个页面太简陋了，我希望有人能帮我写个样式表啥的……</p>
+    <p>⚠️警告：本工具尚不能100%确保稳定性，使用时请注意备份⚠️</p>
+    <hr />
+    <p>处理单张svg: 
+        <input id="SVGFile" class="FileSelector" type="file" accept=".svg">
+        <input id="SnapSvg" class="Button" type="button" onclick="OnClickSnapSvg()" value="运行">
+    </p>
+    <p>处理整个.sb3文件: 
+        <input id="SB3File" class="FileSelector" type="file" accept=".sb3">
+        <input id="SnapSvg" class="Button" type="button" onclick="OnClickSnapSb3()" value="运行">
+    </p>
+    <p>提示：可拖动文件到此处</p>
+    <p id="Loading" style="display: none;">
+        正在运行中，请耐心等待……<br />
+        运行完毕后将自动弹出下载，如果没有反应则说明程序报错。<br />
+    </p>
+    <p id="Error" style="display: none;">
+        程序报错！请将该错误反馈给作者。
+    </p>
+    <hr />
+    <p>~ 配置 ~</p>
+    <p>
+        <input id="IsSnapEnable" type="checkbox" value="snap" checked="true">
+        合并重合点（修复“倒刺”）<br />
+        检测阈值：<input id="SnapThreshold" type="number" value="0.02" min="0.005" max="1" step="0.001">（不要随意更改此值）<br />
+        scratch 在缩放或旋转路径时，对每个浮点数都是分别计算的，最终就有可能丢精度，在路径首尾两端产生两个非常接近但不重合的点。<br />
+        这种现象会在描边的首尾相接处产生细长而尖锐的额外部分，我个人将其形象地称作“倒刺”。<br />
+        <!--<input id="IsSnapRegSprite" type="checkbox" value="snapregsprite">
+        使用正则表达式匹配角色名称：/<input id="SnapRegSprite" type="text" placeholder="Sprite 1">/（区分大小写）<br />
+        <input id="IsSnapRegCostume" type="checkbox" value="snapregcostume">
+        使用正则表达式匹配造型名称：/<input id="SnapRegCostume" type="text" placeholder="costume1">/（区分大小写）-->
+    </p>
+    <hr />
+    <p>附带功能：</p>
+    <p>
+        <input id="IsSimpEnable" type="checkbox" value="simp">
+        取整所有数值，并保留<input id="SimpDigit" type="number" value="2" min="0" max="4" step="1">位小数<br />
+        scratch 的矢量图编辑器默认保留5位小数。<br />
+        取整小数可以稍微缩小 svg 的体积（约3%），但不能加快运行速度。<br />
+        可能会破坏某些原本严丝合缝的路径。
+    </p>
+    <hr />
+    <p>
+        <input id="IsLinecapEnable" type="checkbox" value="linecap">
+        更改描边结尾样式为<select id="LinecapType">
+            <option value="0">无（butt）</option>
+            <option value="1">圆形（round）</option>
+            <option value="2">方形（square）</option>
+        </select><br />
+        封闭图形的描边结尾默认为 butt，线条则是 round。
+    </p>
+    <hr />
+    <p>
+        <input id="IsLinejoinEnable" type="checkbox" value="linejoin">
+        更改描边拐点样式为<select id="LinejoinType">
+            <option value="0">尖角（miter）</option>
+            <option value="1">圆角（round）</option>
+            <option value="2">斜切（bevel）</option>
+        </select><br />
+        默认值为 miter。<br />
+        在本工具诞生前，曾有人提出：把所有图像全部改为圆角，以解决“倒刺”的问题。
+    </p>
+
+</body>
+</html>
