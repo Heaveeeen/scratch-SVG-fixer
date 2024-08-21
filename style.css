@@ -1,0 +1,12 @@
+
+.FileSelector {
+    border: 2px dashed;
+    padding: 3px;
+    cursor: pointer;
+}
+.Button {
+    cursor: pointer;
+}
+p {
+    line-height: 28px;
+}

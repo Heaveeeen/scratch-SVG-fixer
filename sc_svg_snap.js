@@ -190,15 +190,6 @@ const scsvgsnap = {
         if (cfg.snap || cfg.simp) {
             res = svg.replace(/(?<=(?:<path d=)*"[Mz\d\-\.clvh ,]*)M([\d\-\.clvh ,]+)z*/g, (match) => {
                 const p = this.parsePath(match);
-                // 去除重合点
-                if (cfg.snap) {
-                    const thr = cfg.snap.threshold;
-                    if (0 < thr && thr < 1) {
-                        this.snap(p, thr);
-                    } else {
-                        this.snap(p);
-                    }
-                }
                 // 取整
                 if (cfg.simp) {
                     const dig = cfg.simp.digit;
@@ -206,6 +197,15 @@ const scsvgsnap = {
                         this.simp(p, dig);
                     } else {
                         this.simp(p)
+                    }
+                }
+                // 去除重合点
+                if (cfg.snap) {
+                    const thr = cfg.snap.threshold;
+                    if (0 < thr && thr < 1) {
+                        this.snap(p, thr);
+                    } else {
+                        this.snap(p);
                     }
                 }
                 const newPath = this.dumpPath(p)
