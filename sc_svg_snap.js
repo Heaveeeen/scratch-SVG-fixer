@@ -162,19 +162,31 @@ const scsvgsnap = {
         return res;
     },
 
+    
+    // 用于匹配所有 linecap 的正则表达式
+    linecapReg: new RegExp('(?<=stroke-linecap=")([^"]*)(?=")', "g"),
+
 
     // 改变一张 svg 中所有 path 的 stroke-linecap
     linecap: function(svg, cap) {
-        const newSvg = svg.replace(/(?<=stroke-linecap=")([^"]*)(?=")/g, cap);
+        const newSvg = svg.replace(this.linecapReg, cap);
         return newSvg;
     },
+
+    
+    // 用于匹配所有 linejoin 的正则表达式
+    linejoinReg: new RegExp('(?<=stroke-linejoin=")([^"]*)(?=")', "g"),
 
 
     // 改变一张 svg 的 stroke-linejoin
     linejoin: function(svg, join) {
-        const newSvg = svg.replace(/(?<=stroke-linejoin=")([^"]*)(?=")/g, join);
+        const newSvg = svg.replace(this.linejoinReg, join);
         return newSvg;
     },
+
+
+    // 用于匹配所有 svg path 的正则表达式
+    svgPathReg: new RegExp('(?<=<path d="[Mz\d\-\.clvh ,]*)M([\d\-\.clvh ,]+)z*', "g"),
 
 
     // 输入一张 svg 的源码
@@ -188,7 +200,7 @@ const scsvgsnap = {
         let res = "";
 
         if (cfg.snap || cfg.simp) {
-            res = svg.replace(/(?<=(?:<path d=)*"[Mz\d\-\.clvh ,]*)M([\d\-\.clvh ,]+)z*/g, (match) => {
+            res = svg.replace(this.svgPathReg, (match) => {
                 const p = this.parsePath(match);
                 // 取整
                 if (cfg.simp) {
