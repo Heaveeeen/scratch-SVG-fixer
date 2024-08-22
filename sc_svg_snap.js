@@ -186,7 +186,7 @@ const scsvgsnap = {
 
 
     // 用于匹配所有 svg path 的正则表达式
-    svgPathReg: new RegExp('(?<=<path d="[Mz\d\-\.clvh ,]*)M([\d\-\.clvh ,]+)z*', "g"),
+    svgPathReg: new RegExp('(?<=<path d="[Mz\\d\\-\\.clvh ,]*)M([\\d\\-\\.clvh ,]+)z*', "g"),
 
 
     // 输入一张 svg 的源码
