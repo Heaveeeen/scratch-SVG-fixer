@@ -1,12 +1,195 @@
-
 .FileSelector {
-    border: 2px dashed;
-    padding: 3px;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    background-color: #40B3DF;
+    color: white;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+    top: 10px;
+    width: 100px;
+    height: 20px;
+}
+
+.FileSelector:hover {
+    background-color: #0f69c9;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.FileSelector:active {
+    background-color: #0f69c9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#SVGFile {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     cursor: pointer;
 }
+#SB3File {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
 .Button {
     cursor: pointer;
 }
-p {
-    line-height: 28px;
+
+.an1 {
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    /*增加平滑效果*/
+    width: 70px;
+    height: 30px;
+    background-color: #40B3DF;
+    line-height: 0.5;
+}
+
+.an1:hover {
+    background-color: #0f69c9;
+    width: 75px;
+    height: 35px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.pic {
+    overflow-y: auto;
+    opacity: 1;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.an1:active {
+    width: 70px;
+    height: 30px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.warning-box {
+    padding: 15px;
+    background-color: #FFF3CD;
+    min-width: 200px;
+    /*width: 400px;*/
+    position: relative;
+    min-height: 20px;
+    border-left: 7px solid #ffd17b;
+    /* 橙色边框 */
+}
+
+.warning-h {
+    color: #ffd17b
+}
+
+.warning-text {
+    color: #000000;
+}
+
+.ikun {
+    padding: 5px;
+    border-radius: 15px;
+    position: relative;
+    background-color: white;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* 基础样式 */
+select {
+    appearance: none;
+    /* 移除默认样式 */
+    -webkit-appearances: none;
+    /* Chrome/Safari */
+    -moz-appearance: none;
+    /* Firefox */
+    background-color: #fff;
+    /* 背景颜色 */
+    border: 1px solid #ccc;
+    /* 边框 */
+    border-radius: 5px;
+    /* 圆角 */
+    padding: 8px 35px 8px 10px;
+    /* 内边距，右边的内边距较大以容纳箭头 */
+    width: 150px;
+    /* 宽度 */
+    font-size: 16px;
+    /* 字体大小 */
+    color: #333;
+    /* 文字颜色 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* 阴影 */
+    transition: all 0.3s ease;
+    /* 平滑过渡 */
+}
+
+/* 鼠标悬停效果 */
+select:hover {
+    border-color: #0f69c9;
+    /* 边框颜色 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    /* 较大的阴影 */
+}
+
+/* 激活/点击效果 */
+select:active,
+select:focus {
+    border-color: #0f69c9;
+    /* 边框颜色 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    /* 较小的阴影 */
+    outline: none;
+    /* 移除轮廓线 */
+}
+
+/* 选项样式 */
+option {
+    background-color: #fff;
+    /* 背景颜色 */
+    color: #333;
+    /* 文字颜色 */
+    padding: 8px;
+    /* 内边距 */
+}
+.styled-input {
+    width: 100px;
+    height: 25px;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    background-color: #ffffff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    transition: all 0.3s ease;
+  }
+  
+  .styled-input:focus {
+    background-color: #d9ecf1;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+a{
+    color: black;
 }
