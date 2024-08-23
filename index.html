@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <title>Scratch SVG Fixer</title>
     <script src="FileSaver.min.js"></script>
@@ -8,88 +9,126 @@
     <script src="main.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
+
 <body>
-    <h1>Scratch 矢量图修复器 v0.1.1</h1>
-    <p>这个页面太简陋了，我希望有人能帮我写个样式表啥的……</p>
-    <p>⚠️警告：本工具尚不能100%确保稳定性，使用时请注意备份⚠️</p>
-    <hr />
-    <p>处理单张svg: 
-        <input id="SVGFile" class="FileSelector" type="file" accept=".svg">
-        <input id="SnapSvg" class="Button" type="button" onclick="OnClickSnapSvg()" value="运行">
-    </p>
-    <p>处理整个.sb3文件: 
-        <input id="SB3File" class="FileSelector" type="file" accept=".sb3">
-        <input id="SnapSvg" class="Button" type="button" onclick="OnClickSnapSb3()" value="运行">
-    </p>
-    <p>
-        提示：可拖动文件到此处。<br />
-        PS: 输出的.sb3文件不带压缩，文件体积可能会稍大，丢进tw里保存一遍就变小了。
-    </p>
-    <p id="Loading" style="display: none;">
-        正在运行中，请耐心等待……<br />
-        运行完毕后将自动弹出下载，如果没有反应则说明程序报错。<br />
-    </p>
-    <p id="Error" style="display: none;">
-        ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️<br />
-        程序报错！请将该错误反馈给作者！<br />
-        ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
-    </p>
-    <hr />
-    <p>~ 配置 ~</p>
-    <p>
-        <input id="IsSnapEnable" type="checkbox" value="snap" checked="true">
-        合并重合点（修复“倒刺”）<br />
-        检测阈值：<input id="SnapThreshold" type="number" value="0.02" min="0.005" max="1" step="0.001">（不要随意更改此值）<br />
-        scratch 在缩放或旋转路径时，对每个浮点数都是分别计算的，最终就有可能丢精度，在路径首尾两端产生两个非常接近但不重合的点。<br />
-        这种现象会在描边的首尾相接处产生细长而尖锐的额外部分，我个人将其形象地称作“倒刺”。<br />
-        <!--<input id="IsSnapRegSprite" type="checkbox" value="snapregsprite">
+    <img class="pic" src="https://img.picui.cn/free/2024/08/17/66c043dbabbe2.jpg" alt="背景加载失败！">
+    <div class="pic">
+        <div class="ikun" style="width: 90%;height: 200px;left: 50%;transform: translate(-50%,0%);top: 3%;">
+            <h2>Scratch 矢量图修复器 v0.1.1</h2>
+            <div class="warning-box" style="left: 50%;transform: translate(-50%,0%);width: 80%;">
+                <h class="warning-h">警告：</h>
+                <p class="warning-text">⚠️本工具尚不能100%确保稳定性，使用时请注意备份⚠️</p>
+            </div>
+        </div>
+
+        <div class="ikun" style="width:90%;left: 50%;transform: translate(-50%,20%);">
+            <p>处理单张svg:
+                <label for="SVGFile" class="FileSelector">
+                    点击上传文件
+                    <input id="SVGFile" type="file" accept=".svg" />
+                </label>
+                <input id="SnapSvg" class="an1" type="button" onclick="OnClickSnapSvg()" value="运行">
+            </p>
+            <p>处理整个.sb3文件:
+                <label for="SB3File" class="FileSelector">
+                    点击上传文件
+                    <input id="SB3File" type="file" accept=".sb3" />
+                </label>
+                <input id="SnapSvg" class="an1" type="button" onclick="OnClickSnapSb3()" value="运行">
+            </p>
+            <p>
+                提示：可拖动文件到此处。<br />
+                PS: 输出的.sb3文件不带压缩，文件体积可能会稍大，丢进tw里保存一遍就变小了。
+            </p>
+            <p>~ 配置 ~</p>
+            <p>
+                <input id="IsSnapEnable" type="checkbox" value="snap" checked="true">
+                合并重合点（修复“倒刺”）<br />
+                检测阈值：<input class="styled-input" id="SnapThreshold" type="number" value="0.02" min="0.005" max="1"
+                    step="0.001">（不要随意更改此值）<br />
+                scratch 在缩放或旋转路径时，对每个浮点数都是分别计算的，最终就有可能丢精度，在路径首尾两端产生两个非常接近但不重合的点。<br />
+                这种现象会在描边的首尾相接处产生细长而尖锐的额外部分，我个人将其形象地称作“倒刺”。<br />
+                <!--<input id="IsSnapRegSprite" type="checkbox" value="snapregsprite">
         使用正则表达式匹配角色名称：/<input id="SnapRegSprite" type="text" placeholder="Sprite 1">/（区分大小写）<br />
         <input id="IsSnapRegCostume" type="checkbox" value="snapregcostume">
         使用正则表达式匹配造型名称：/<input id="SnapRegCostume" type="text" placeholder="costume1">/（区分大小写）-->
-    </p>
-    <hr />
-    <p>附带功能：</p>
-    <p>
-        <input id="IsSimpEnable" type="checkbox" value="simp">
-        取整所有数值，并保留<input id="SimpDigit" type="number" value="2" min="0" max="4" step="1">位小数<br />
-        scratch 的矢量图编辑器默认保留5位小数。<br />
-        取整小数可以稍微缩小 svg 的体积（约3%），但不能加快运行速度。<br />
-        可能会破坏某些原本严丝合缝的路径。
-    </p>
-    <hr />
-    <p>
-        <input id="IsLinecapEnable" type="checkbox" value="linecap">
-        更改描边结尾样式为<select id="LinecapType">
-            <option value="0">无（butt）</option>
-            <option value="1">圆形（round）</option>
-            <option value="2">方形（square）</option>
-        </select><br />
-        封闭图形的描边结尾默认为 butt，线条则是 round。
-    </p>
-    <hr />
-    <p>
-        <input id="IsLinejoinEnable" type="checkbox" value="linejoin">
-        更改描边拐点样式为<select id="LinejoinType">
-            <option value="0">尖角（miter）</option>
-            <option value="1">圆角（round）</option>
-            <option value="2">斜切（bevel）</option>
-        </select><br />
-        默认值为 miter。<br />
-        在本工具诞生前，曾有人提出：把所有图像全部改为圆角，以解决“倒刺”的问题。
-    </p>
-    <hr />
-    <p>
-        ~ 关于 Scratch SVG Fixer ~
-    </p>
-    <p>
-        <a href="https://github.com/Heaveeeen/scratch-SVG-fixer">github</a> · <a href="https://www.bilibili.com/video/BV1r4W8egERq">bilibili</a>
-    </p>
-    <p>
-        作者：苍穹 <a href="https://github.com/Heaveeeen">github</a> · <a href="https://space.bilibili.com/380760053">bilibili</a> · <a href="mainto:heaveeeen@qq.com">heaveeeen@qq.com</a>
-    </p>
-    <p>
-        使用了 <a href="https://github.com/Stuk/jszip">jszip</a> 和 <a href="https://github.com/eligrey/FileSaver.js">FileSaver</a> ，本人不懂条款，如有侵权请联系作者整改。
-    </p>
+            </p>
+        </div>
+        <p id="Loading" style="display: none;">
+            正在运行中，请耐心等待……<br />
+            运行完毕后将自动弹出下载，如果没有反应则说明程序报错。<br />
+        </p>
+        <div class="ikun" style="width:90%;left: 50%;transform: translate(-50%,40%);">
+            <p>附带功能：</p>
+            <p>
+                <input id="IsSimpEnable" type="checkbox" value="simp">
+                取整所有数值，并保留<input id="SimpDigit" class="styled-input" type="number" value="2" min="0" max="4"
+                    step="1">位小数<br />
+                scratch 的矢量图编辑器默认保留5位小数。<br />
+                取整小数可以稍微缩小 svg 的体积（约3%），但不能加快运行速度。<br />
+                可能会破坏某些原本严丝合缝的路径。
+            </p>
 
+            <p>
+                <input id="IsLinecapEnable" type="checkbox" value="linecap">
+                更改描边结尾样式为<select id="LinecapType">
+                    <option value="0">无（butt）</option>
+                    <option value="1">圆形（round）</option>
+                    <option value="2">方形（square）</option>
+                </select><br />
+                封闭图形的描边结尾默认为 butt，线条则是 round。
+            </p>
+
+            <p>
+                <input id="IsLinejoinEnable" type="checkbox" value="linejoin">
+                更改描边拐点样式为<select id="LinejoinType">
+                    <option value="0">尖角（miter）</option>
+                    <option value="1">圆角（round）</option>
+                    <option value="2">斜切（bevel）</option>
+                </select><br />
+                默认值为 miter。<br />
+                在本工具诞生前，曾有人提出：把所有图像全部改为圆角，以解决“倒刺”的问题。
+            </p>
+        </div>
+        <div class="ikun" style="width:90%;left: 50%;transform: translate(-50%,100%);">
+            <p>
+                ~ 关于 Scratch SVG Fixer ~
+            </p>
+            <p>
+                <a href="https://github.com/Heaveeeen/scratch-SVG-fixer">github</a> · <a
+                    href="https://www.bilibili.com/video/BV1r4W8egERq">bilibili</a>
+            </p>
+            <p>
+                作者：苍穹 <a href="https://github.com/Heaveeeen">github</a> · <a
+                    href="https://space.bilibili.com/380760053">bilibili</a> · <a
+                    href="mainto:heaveeeen@qq.com">heaveeeen@qq.com</a>
+            </p>
+            <p>
+                美化：ikunactrl <a href="https://github.com/ikunactrl">github</a> ~ <a href="https://space.bilibili.com/2075801677">bilibili</a>
+            </p>
+            <p>
+                使用了 <a href="https://github.com/Stuk/jszip">jszip</a> 和 <a
+                    href="https://github.com/eligrey/FileSaver.js">FileSaver</a> ，本人不懂条款，如有侵权请联系作者整改。
+            </p>
+        </div>
+    </div>
+    <div id="Error"
+        style="position: fixed;background-color: rgb(255, 255, 255);display: none;width: 200%;height: 200%;">
+        <p style="position: fixed;top: 50%;left: 50%;font-size: 24px;transform: translate(-50%,-50%);">
+            ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️<br />
+            程序报错！请将该错误反馈给作者！<br />
+            ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+            作者：苍穹
+            <br>
+            <a href="https://github.com/Heaveeeen" style="color: black;">github账号</a>
+            <br>
+            <a href="https://space.bilibili.com/380760053" style="color: black;">bilibili账号</a>
+            <br>
+            <a href="mainto:heaveeeen@qq.com" style="color: black;">邮箱:heaveeeen@qq.com</a>
+            <br>
+            ❗请刷新页面❗
+        </p>
+    </div>
 </body>
+
 </html>
