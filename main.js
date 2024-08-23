@@ -76,7 +76,7 @@ function HandleSnapSb3(sb3, pj, file, cfg) {
         });
     }).catch((error) => {
         console.error('处理 SVG 文件时发生错误:', error);
-        const e = document.getElementById("Error");
+        const e = document.getElementById("Error");//用id获取元素
         e.style.display = "block";
         e.innerHTML = error.message;
     }).finally(() => {
